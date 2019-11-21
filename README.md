@@ -29,7 +29,7 @@
 
 ## Networking
 
- - [ ] Custom VPC
+ - [X] Custom VPC
    - [ ] DMZ (public subnet): ELB, bastion, NAT
    - [ ] Internal (private subnet): web servers, RDS
  - [ ] HTTPS access to the ELB

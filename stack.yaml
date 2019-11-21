@@ -22,7 +22,19 @@ Parameters:
     ConstraintDescription: Must be a valid EC2 instance type.
     Default: t2.micro
 
+  VpcCIDR:
+    Description: VPC CIDR
+    Type: String
+    Default: 10.123.0.0/16
+
 Resources:
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: !Ref VpcCIDR
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+
   Bastion:
     Type: "AWS::EC2::Instance"
     Properties:
