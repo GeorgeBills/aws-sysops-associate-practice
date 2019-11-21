@@ -27,6 +27,36 @@ Parameters:
     Type: String
     Default: 10.123.0.0/16
 
+  PublicSubnet1CIDR:
+    Description: CIDR for public subnet 1
+    Type: String
+    Default: 10.123.1.0/24
+
+  PublicSubnet2CIDR:
+    Description: CIDR for public subnet 2
+    Type: String
+    Default: 10.123.2.0/24
+
+  PublicSubnet3CIDR:
+    Description: CIDR for public subnet 3
+    Type: String
+    Default: 10.123.3.0/24
+
+  PrivateSubnet1CIDR:
+    Description: CIDR for private subnet 1
+    Type: String
+    Default: 10.123.11.0/24
+
+  PrivateSubnet2CIDR:
+    Description: CIDR for private subnet 2
+    Type: String
+    Default: 10.123.12.0/24
+
+  PrivateSubnet3CIDR:
+    Description: CIDR for private subnet 3
+    Type: String
+    Default: 10.123.13.0/24
+
 Resources:
   VPC:
     Type: AWS::EC2::VPC
@@ -34,6 +64,54 @@ Resources:
       CidrBlock: !Ref VpcCIDR
       EnableDnsSupport: true
       EnableDnsHostnames: true
+
+  PublicSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: !Select [0, !GetAZs ""]
+      CidrBlock: !Ref PublicSubnet1CIDR
+      MapPublicIpOnLaunch: true
+
+  PublicSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: !Select [1, !GetAZs ""]
+      CidrBlock: !Ref PublicSubnet2CIDR
+      MapPublicIpOnLaunch: true
+
+  PublicSubnet3:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: !Select [2, !GetAZs ""]
+      CidrBlock: !Ref PublicSubnet3CIDR
+      MapPublicIpOnLaunch: true
+
+  PrivateSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: !Select [0, !GetAZs ""]
+      CidrBlock: !Ref PrivateSubnet1CIDR
+      MapPublicIpOnLaunch: false
+
+  PrivateSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: !Select [1, !GetAZs ""]
+      CidrBlock: !Ref PrivateSubnet2CIDR
+      MapPublicIpOnLaunch: false
+
+  PrivateSubnet3:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: !Select [2, !GetAZs ""]
+      CidrBlock: !Ref PrivateSubnet3CIDR
+      MapPublicIpOnLaunch: false
 
   Bastion:
     Type: "AWS::EC2::Instance"

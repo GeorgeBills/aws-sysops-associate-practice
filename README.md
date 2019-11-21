@@ -30,8 +30,8 @@
 ## Networking
 
  - [X] Custom VPC
-   - [ ] DMZ (public subnet): ELB, bastion, NAT
-   - [ ] Internal (private subnet): web servers, RDS
+   - [X] DMZ (public subnets): ELB, bastion, NAT
+   - [X] Internal (private subnets): web servers, RDS
  - [ ] HTTPS access to the ELB
  - [ ] SSH access to the bastion, only from your home IP
  - [ ] SSH access to the web servers, only from the bastion
