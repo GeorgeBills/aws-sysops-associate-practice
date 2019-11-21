@@ -1,0 +1,33 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: An example Drupal 8 CloudFormation stack.
+
+Mappings:
+  RegionMap:
+    ap-southeast-2:
+      "HVM64": "ami-08a74056dfd30c986"
+
+Parameters:
+  KeyName:
+    Description: KeyPair
+    Type: AWS::EC2::KeyPair::KeyName
+    ConstraintDescription: Must be the name of an existing EC2 KeyPair.
+
+  InstanceType:
+    Description: EC2 instance type
+    Type: String
+    AllowedValues:
+      - t2.micro
+      - t2.small
+      - t2.medium
+    ConstraintDescription: Must be a valid EC2 instance type.
+    Default: t2.micro
+
+Resources:
+  Bastion:
+    Type: "AWS::EC2::Instance"
+    Properties:
+      ImageId: !FindInMap [RegionMap, !Ref "AWS::Region", HVM64]
+      InstanceType:
+        Ref: InstanceType
+      KeyName:
+        Ref: KeyName

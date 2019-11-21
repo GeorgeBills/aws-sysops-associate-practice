@@ -5,7 +5,7 @@
    - [ ] Minimum 3 instances
    - [ ] Spread across 3 availability zones
    - [ ] Self configured on launch
- - [ ] EC2 bastion host
+ - [X] EC2 bastion host
  - [ ] RDS MySQL
  - [ ] ELB
 
