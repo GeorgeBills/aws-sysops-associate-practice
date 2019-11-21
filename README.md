@@ -32,11 +32,11 @@
  - [X] Custom VPC
    - [X] DMZ (public subnets): ELB, bastion, NAT
    - [X] Internal (private subnets): web servers, RDS
- - [ ] HTTPS access to the ELB
- - [ ] SSH access to the bastion, only from your home IP
- - [ ] SSH access to the web servers, only from the bastion
- - [ ] HTTP access to the web servers, only from the ELB
- - [ ] MySQL access to RDS, only from the web servers
+ - [X] HTTPS access to the ELB
+ - [X] SSH access to the bastion, only from your home IP
+ - [X] SSH access to the web servers, only from the bastion
+ - [X] HTTP access to the web servers, only from the ELB
+ - [X] MySQL access to RDS, only from the web servers
  - [ ] NAT instance to allow the EC2 servers to connect out for e.g. Yum updates
        (NAT instances are much cheaper than gateways...)
  - [ ] Registered domain name for the ELB
