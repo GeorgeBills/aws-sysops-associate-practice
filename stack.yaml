@@ -113,6 +113,15 @@ Resources:
       CidrBlock: !Ref PrivateSubnet3CIDR
       MapPublicIpOnLaunch: false
 
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+
+  InternetGatewayAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      InternetGatewayId: !Ref InternetGateway
+      VpcId: !Ref VPC
+
   Bastion:
     Type: "AWS::EC2::Instance"
     Properties:
