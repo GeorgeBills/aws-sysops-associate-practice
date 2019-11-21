@@ -40,7 +40,7 @@
  - [ ] NAT instance to allow the EC2 servers to connect out for e.g. Yum updates
        (NAT instances are much cheaper than gateways...)
  - [ ] Registered domain name for the ELB
- - [ ] Elastic IP for the bastion
+ - [X] Elastic IP for the bastion
 
 ## Monitoring
 

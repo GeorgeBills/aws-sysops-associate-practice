@@ -198,3 +198,12 @@ Resources:
         Ref: InstanceType
       KeyName:
         Ref: KeyName
+
+  BastionEIP:
+    Type: AWS::EC2::EIP
+    Properties:
+      InstanceId: !Ref Bastion
+
+Outputs:
+  BastionIP:
+    Value: !GetAtt Bastion.PublicIp
