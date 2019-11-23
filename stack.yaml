@@ -292,6 +292,17 @@ Resources:
     Properties:
       InstanceId: !Ref Bastion
 
+  Drupal:
+    Type: "AWS::EC2::Instance"
+    Properties:
+      SubnetId: !Ref PrivateSubnet1
+      ImageId: !FindInMap [RegionMap, !Ref "AWS::Region", "AmazonLinux2HVM64"]
+      InstanceType:
+        Ref: InstanceType
+      KeyName:
+        Ref: KeyName
+      SecurityGroupIds: [!Ref WebServerSecurityGroup]
+
 Outputs:
   BastionIP:
     Value: !GetAtt Bastion.PublicIp
