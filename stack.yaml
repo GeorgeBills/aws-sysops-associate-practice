@@ -207,6 +207,7 @@ Resources:
       KeyName:
         Ref: KeyName
       SourceDestCheck: false
+      SecurityGroupIds: [!Ref NATSecurityGroup]
 
   Bastion:
     Type: "AWS::EC2::Instance"
@@ -217,6 +218,7 @@ Resources:
         Ref: InstanceType
       KeyName:
         Ref: KeyName
+      SecurityGroupIds: [!Ref BastionSecurityGroup]
 
   BastionEIP:
     Type: AWS::EC2::EIP
