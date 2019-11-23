@@ -198,13 +198,17 @@ Resources:
 
   # SECURITY GROUPS
 
-  ELBSecurityGroup:
+  ApplicationLoadBalancerSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupName: "https-sg"
-      GroupDescription: "Allows HTTPS from the world."
+      GroupName: "alb-sg"
+      GroupDescription: "Allows HTTP and HTTPS from the world."
       VpcId: !Ref VPC
       SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
         - IpProtocol: tcp
           FromPort: 443
           ToPort: 443
@@ -302,6 +306,37 @@ Resources:
       KeyName:
         Ref: KeyName
       SecurityGroupIds: [!Ref WebServerSecurityGroup]
+
+  ApplicationLoadBalancer:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name: drupal-alb
+      SecurityGroups: [!Ref ApplicationLoadBalancerSecurityGroup]
+      Subnets:
+        - !Ref PublicSubnet1
+        - !Ref PublicSubnet2
+        - !Ref PublicSubnet3
+      Type: application
+
+  ApplicationLoadBalancerListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      DefaultActions:
+        - Type: "forward"
+          TargetGroupArn: !Ref ApplicationLoadBalancerTargetGroup
+      LoadBalancerArn: !Ref ApplicationLoadBalancer
+      Port: 80
+      Protocol: HTTP
+
+  ApplicationLoadBalancerTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Name: drupal-tg
+      Port: 80
+      Protocol: HTTP
+      Targets:
+        - Id: !Ref Drupal
+      VpcId: !Ref VPC
 
 Outputs:
   BastionIP:

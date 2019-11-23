@@ -13,7 +13,7 @@
    - [ ] Self configured on launch
  - [X] EC2 bastion host
  - [ ] RDS MySQL
- - [ ] ELB
+ - [X] ELB
  - [ ] Uploads stored in S3
 
 ## High Availability and Scaling
