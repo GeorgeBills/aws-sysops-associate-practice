@@ -37,7 +37,7 @@
  - [X] SSH access to the web servers, only from the bastion
  - [X] HTTP access to the web servers, only from the ELB
  - [X] MySQL access to RDS, only from the web servers
- - [ ] NAT instance to allow the EC2 servers to connect out for e.g. Yum updates
+ - [X] NAT instance to allow the EC2 servers to connect out for e.g. Yum updates
        (NAT instances are much cheaper than gateways...)
  - [ ] Registered domain name for the ELB
  - [X] Elastic IP for the bastion

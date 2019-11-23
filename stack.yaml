@@ -4,7 +4,8 @@ Description: An example Drupal 8 CloudFormation stack.
 Mappings:
   RegionMap:
     ap-southeast-2:
-      "HVM64": "ami-08a74056dfd30c986"
+      "AmazonLinux2HVM64": "ami-08a74056dfd30c986"
+      "AmazonLinuxNATHVM64": "ami-01866304647fb36d8"
 
 Parameters:
   MyHomeCIDR:
@@ -196,10 +197,20 @@ Resources:
 
   # HOSTS
 
+  NAT:
+    Type: "AWS::EC2::Instance" # using an instance just because gateways are expensive
+    Properties:
+      ImageId: !FindInMap [RegionMap, !Ref "AWS::Region", "AmazonLinuxNATHVM64"]
+      InstanceType:
+        Ref: InstanceType
+      KeyName:
+        Ref: KeyName
+      SourceDestCheck: false
+
   Bastion:
     Type: "AWS::EC2::Instance"
     Properties:
-      ImageId: !FindInMap [RegionMap, !Ref "AWS::Region", HVM64]
+      ImageId: !FindInMap [RegionMap, !Ref "AWS::Region", "AmazonLinux2HVM64"]
       InstanceType:
         Ref: InstanceType
       KeyName:
