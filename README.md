@@ -7,14 +7,14 @@
 
 ## Web application
 
- - [ ] EC2 web servers
+ - [ ] EC2 web servers (Drupal)
    - [ ] Autoscaling
-   - [ ] Minimum 3 instances
-   - [ ] Spread across 3 availability zones
+   - [ ] Minimum 3 instances, spread across 3 availability zones
    - [ ] Self configured on launch
  - [X] EC2 bastion host
  - [ ] RDS MySQL
  - [ ] ELB
+ - [ ] Uploads stored in S3
 
 ## High Availability and Scaling
 
@@ -24,11 +24,12 @@
  - [ ] CloudFront CDN
    - [ ] Static asset (e.g. images, CSS, JS) caching with a high TTL
    - [ ] Dynamic asset (e.g. webpage) caching with a low TTL
+ - [ ] Failover (via Route 53) to a static page in S3 if ELB unhealthy
 
 ## Security
 
  - [ ] ACM certificate provisioned on the ELB
- - [ ] WAF allowing only ports 22 and 443 in
+ - [ ] Basic WAF
  - [ ] Resources provisioned by dedicated user account
  - [ ] IAM authentication to RDS
  - [ ] RDS encrypted at rest
