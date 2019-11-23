@@ -4,9 +4,14 @@ Description: An example Drupal 8 CloudFormation stack.
 Mappings:
   RegionMap:
     ap-southeast-2:
-      "HVM64": "ami-08a74056dfd30c986"
+      "AmazonLinux2HVM64": "ami-08a74056dfd30c986"
+      "AmazonLinuxNATHVM64": "ami-01866304647fb36d8"
 
 Parameters:
+  MyHomeCIDR:
+    Type: String
+    ConstraintDescription: My home CIDR range.
+
   KeyName:
     Description: KeyPair
     Type: AWS::EC2::KeyPair::KeyName
@@ -22,12 +27,271 @@ Parameters:
     ConstraintDescription: Must be a valid EC2 instance type.
     Default: t2.micro
 
+  VpcCIDR:
+    Description: VPC CIDR
+    Type: String
+    Default: 10.123.0.0/16
+
+  PublicSubnet1CIDR:
+    Description: CIDR for public subnet 1
+    Type: String
+    Default: 10.123.1.0/24
+
+  PublicSubnet2CIDR:
+    Description: CIDR for public subnet 2
+    Type: String
+    Default: 10.123.2.0/24
+
+  PublicSubnet3CIDR:
+    Description: CIDR for public subnet 3
+    Type: String
+    Default: 10.123.3.0/24
+
+  PrivateSubnet1CIDR:
+    Description: CIDR for private subnet 1
+    Type: String
+    Default: 10.123.11.0/24
+
+  PrivateSubnet2CIDR:
+    Description: CIDR for private subnet 2
+    Type: String
+    Default: 10.123.12.0/24
+
+  PrivateSubnet3CIDR:
+    Description: CIDR for private subnet 3
+    Type: String
+    Default: 10.123.13.0/24
+
 Resources:
-  Bastion:
-    Type: "AWS::EC2::Instance"
+  # NETWORKING
+
+  VPC:
+    Type: AWS::EC2::VPC
     Properties:
-      ImageId: !FindInMap [RegionMap, !Ref "AWS::Region", HVM64]
+      CidrBlock: !Ref VpcCIDR
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+
+  PublicSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: !Select [0, !GetAZs ""]
+      CidrBlock: !Ref PublicSubnet1CIDR
+      MapPublicIpOnLaunch: true
+
+  PublicSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: !Select [1, !GetAZs ""]
+      CidrBlock: !Ref PublicSubnet2CIDR
+      MapPublicIpOnLaunch: true
+
+  PublicSubnet3:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: !Select [2, !GetAZs ""]
+      CidrBlock: !Ref PublicSubnet3CIDR
+      MapPublicIpOnLaunch: true
+
+  PrivateSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: !Select [0, !GetAZs ""]
+      CidrBlock: !Ref PrivateSubnet1CIDR
+      MapPublicIpOnLaunch: false
+
+  PrivateSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: !Select [1, !GetAZs ""]
+      CidrBlock: !Ref PrivateSubnet2CIDR
+      MapPublicIpOnLaunch: false
+
+  PrivateSubnet3:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: !Select [2, !GetAZs ""]
+      CidrBlock: !Ref PrivateSubnet3CIDR
+      MapPublicIpOnLaunch: false
+
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+
+  InternetGatewayAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      InternetGatewayId: !Ref InternetGateway
+      VpcId: !Ref VPC
+
+  # NETWORKING: ROUTING
+
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+
+  PrivateRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+
+  PrivateToInternetRoute:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId:
+        Ref: PrivateRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      InstanceId:
+        Ref: NAT
+
+  PublicToInternetRoute:
+    Type: AWS::EC2::Route
+    DependsOn: InternetGateway
+    Properties:
+      RouteTableId:
+        Ref: PublicRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId:
+        Ref: InternetGateway
+
+  PrivateSubnet1PrivateRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable
+      SubnetId: !Ref PrivateSubnet1
+
+  PrivateSubnet2PrivateRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable
+      SubnetId: !Ref PrivateSubnet2
+
+  PrivateSubnet3PrivateRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable
+      SubnetId: !Ref PrivateSubnet3
+
+  PublicSubnet1PublicRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      SubnetId: !Ref PublicSubnet1
+
+  PublicSubnet2PublicRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      SubnetId: !Ref PublicSubnet2
+
+  PublicSubnet3PublicRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      SubnetId: !Ref PublicSubnet3
+
+  # SECURITY GROUPS
+
+  ELBSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: "https-sg"
+      GroupDescription: "Allows HTTPS from the world."
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+
+  BastionSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: "bastion-sg"
+      GroupDescription: "Allows SSH from home."
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: !Ref MyHomeCIDR
+
+  WebServerSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: "web-server-sg"
+      GroupDescription: "Allows HTTP and SSH from internal."
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: !Ref VpcCIDR
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: !Ref VpcCIDR
+
+  RDSSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: "rds-sg"
+      GroupDescription: "Allows MySQL from internal."
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 3306
+          ToPort: 3306
+          CidrIp: !Ref VpcCIDR
+
+  NATSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: "nat-sg"
+      GroupDescription: "Allows any traffic from internal."
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 0
+          ToPort: 65535
+          CidrIp: !Ref VpcCIDR
+
+  # HOSTS
+
+  NAT:
+    Type: "AWS::EC2::Instance" # using an instance just because gateways are expensive
+    Properties:
+      SubnetId: !Ref PublicSubnet1
+      ImageId: !FindInMap [RegionMap, !Ref "AWS::Region", "AmazonLinuxNATHVM64"]
       InstanceType:
         Ref: InstanceType
       KeyName:
         Ref: KeyName
+      SourceDestCheck: false
+      SecurityGroupIds: [!Ref NATSecurityGroup]
+
+  Bastion:
+    Type: "AWS::EC2::Instance"
+    Properties:
+      SubnetId: !Ref PublicSubnet2
+      ImageId: !FindInMap [RegionMap, !Ref "AWS::Region", "AmazonLinux2HVM64"]
+      InstanceType:
+        Ref: InstanceType
+      KeyName:
+        Ref: KeyName
+      SecurityGroupIds: [!Ref BastionSecurityGroup]
+
+  BastionEIP:
+    Type: AWS::EC2::EIP
+    Properties:
+      InstanceId: !Ref Bastion
+
+Outputs:
+  BastionIP:
+    Value: !GetAtt Bastion.PublicIp
