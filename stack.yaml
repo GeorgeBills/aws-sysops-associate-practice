@@ -356,3 +356,6 @@ Resources:
 Outputs:
   BastionIP:
     Value: !GetAtt Bastion.PublicIp
+
+  ApplicationLoadBalancerURL:
+    Value: !GetAtt ApplicationLoadBalancer.DNSName
