@@ -298,6 +298,17 @@ Resources:
 
   Drupal:
     Type: "AWS::EC2::Instance"
+    Metadata:
+      AWS::CloudFormation::Init:
+        config:
+          packages:
+            yum:
+              httpd: []
+          services:
+            sysvinit:
+              httpd:
+                enabled: "true"
+                ensureRunning: "true"
     Properties:
       SubnetId: !Ref PrivateSubnet1
       ImageId: !FindInMap [RegionMap, !Ref "AWS::Region", "AmazonLinux2HVM64"]
@@ -306,6 +317,10 @@ Resources:
       KeyName:
         Ref: KeyName
       SecurityGroupIds: [!Ref WebServerSecurityGroup]
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash -ex
+          /opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource Drupal --region ${AWS::Region}
 
   ApplicationLoadBalancer:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer

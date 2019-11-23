@@ -10,7 +10,7 @@
  - [X] EC2 web servers (Drupal)
    - [ ] Autoscaling
    - [ ] Minimum 3 instances, spread across 3 availability zones
-   - [ ] Self configured on launch
+   - [X] Self configured on launch
  - [X] EC2 bastion host
  - [ ] RDS MySQL
  - [X] ELB
