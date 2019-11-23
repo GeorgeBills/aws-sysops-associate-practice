@@ -200,6 +200,7 @@ Resources:
   NAT:
     Type: "AWS::EC2::Instance" # using an instance just because gateways are expensive
     Properties:
+      SubnetId: !Ref PublicSubnet1
       ImageId: !FindInMap [RegionMap, !Ref "AWS::Region", "AmazonLinuxNATHVM64"]
       InstanceType:
         Ref: InstanceType
@@ -210,6 +211,7 @@ Resources:
   Bastion:
     Type: "AWS::EC2::Instance"
     Properties:
+      SubnetId: !Ref PublicSubnet2
       ImageId: !FindInMap [RegionMap, !Ref "AWS::Region", "AmazonLinux2HVM64"]
       InstanceType:
         Ref: InstanceType
