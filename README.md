@@ -1,3 +1,10 @@
+## Useful commands
+
+ * Create initial stack, update stack:
+   `aws cloudformation deploy --template-file stack.yaml --stack-name mydrupalstack --parameter-overrides KeyName=MyKeyPair MyHomeCIDR=203.0.113.123/0`
+ * Delete stack and all of its resources:
+   `aws cloudformation delete-stack --stack-name mydrupalstack`
+
 ## Web application
 
  - [ ] EC2 web servers
@@ -56,4 +63,4 @@
 ## Tasks
 
  - [ ] Use Systems Manager to update Yum patches for all instances
- - [ ] Apply stack via AWS CLI
+ - [X] Apply stack via AWS CLI
