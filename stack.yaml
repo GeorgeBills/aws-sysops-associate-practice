@@ -323,6 +323,22 @@ Resources:
             #!/bin/bash -ex
             /opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource DrupalLaunchTemplate --region ${AWS::Region}
 
+  DrupalAutoscalingGroup:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      AutoScalingGroupName: drupal-asg
+      LaunchTemplate:
+        LaunchTemplateId: !Ref DrupalLaunchTemplate
+        Version: !GetAtt DrupalLaunchTemplate.LatestVersionNumber
+      MinSize: 3
+      MaxSize: 7
+      TargetGroupARNs:
+        - !Ref ApplicationLoadBalancerTargetGroup
+      VPCZoneIdentifier:
+        - !Ref PrivateSubnet1
+        - !Ref PrivateSubnet2
+        - !Ref PrivateSubnet3
+
   ApplicationLoadBalancer:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
