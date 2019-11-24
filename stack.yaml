@@ -296,8 +296,8 @@ Resources:
     Properties:
       InstanceId: !Ref Bastion
 
-  Drupal:
-    Type: "AWS::EC2::Instance"
+  DrupalLaunchTemplate:
+    Type: AWS::EC2::LaunchTemplate
     Metadata:
       AWS::CloudFormation::Init:
         config:
@@ -310,17 +310,18 @@ Resources:
                 enabled: "true"
                 ensureRunning: "true"
     Properties:
-      SubnetId: !Ref PrivateSubnet1
-      ImageId: !FindInMap [RegionMap, !Ref "AWS::Region", "AmazonLinux2HVM64"]
-      InstanceType:
-        Ref: InstanceType
-      KeyName:
-        Ref: KeyName
-      SecurityGroupIds: [!Ref WebServerSecurityGroup]
-      UserData:
-        Fn::Base64: !Sub |
-          #!/bin/bash -ex
-          /opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource Drupal --region ${AWS::Region}
+      LaunchTemplateName: "drupal-lt"
+      LaunchTemplateData:
+        ImageId: !FindInMap [RegionMap, !Ref "AWS::Region", "AmazonLinux2HVM64"]
+        InstanceType:
+          Ref: InstanceType
+        KeyName:
+          Ref: KeyName
+        SecurityGroupIds: [!Ref WebServerSecurityGroup]
+        UserData:
+          Fn::Base64: !Sub |
+            #!/bin/bash -ex
+            /opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource DrupalLaunchTemplate --region ${AWS::Region}
 
   ApplicationLoadBalancer:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
@@ -349,8 +350,6 @@ Resources:
       Name: drupal-tg
       Port: 80
       Protocol: HTTP
-      Targets:
-        - Id: !Ref Drupal
       VpcId: !Ref VPC
 
 Outputs:

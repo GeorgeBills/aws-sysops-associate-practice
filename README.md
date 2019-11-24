@@ -8,8 +8,8 @@
 ## Web application
 
  - [X] EC2 web servers (Drupal)
-   - [ ] Autoscaling
-   - [ ] Minimum 3 instances, spread across 3 availability zones
+   - [X] Autoscaling
+   - [X] Minimum 3 instances, spread across 3 availability zones
    - [X] Self configured on launch
  - [X] EC2 bastion host
  - [ ] RDS MySQL
