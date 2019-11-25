@@ -347,15 +347,50 @@ Resources:
     Type: AWS::EC2::LaunchTemplate
     Metadata:
       AWS::CloudFormation::Init:
-        config:
+        configSets:
+          default: [preinstall, install, configure, start]
+        preinstall:
+          commands:
+            php_7:
+              command: "amazon-linux-extras enable php7.2"
+            yum_update:
+              command: "yum update -y"
+        install:
           packages:
             yum:
               httpd: []
+              php: [7.2.24]
+              php-gd: []
+              php-mbstring: []
+              php-mysqlnd: []
+              php-opcache: []
+              php-xml: []
+          sources:
+            /var/www: "https://ftp.drupal.org/files/projects/drupal-8.7.10.tar.gz"
+        configure:
+          commands:
+            update_document_root:
+              command:
+                - sed
+                - -si
+                - s|var/www/html|/var/www/drupal-8.7.10|g
+                - /etc/httpd/conf/httpd.conf
+        start:
           services:
             sysvinit:
               httpd:
                 enabled: "true"
                 ensureRunning: "true"
+                files:
+                  - "/etc/httpd/httpd.conf" # restart if we reconfigure
+                packages:
+                  yum: # restart if we re/install any dependencies
+                    - php
+                    - php-gd
+                    - php-mbstring
+                    - php-mysqlnd
+                    - php-opcache
+                    - php-xml
     Properties:
       LaunchTemplateName: "drupal-lt"
       LaunchTemplateData:
@@ -369,7 +404,6 @@ Resources:
           Fn::Base64: !Sub |
             #!/bin/bash -ex
             /opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource DrupalLaunchTemplate --region ${AWS::Region}
-            touch /var/www/html/index.html
 
   DrupalAutoscalingGroup:
     Type: AWS::AutoScaling::AutoScalingGroup
