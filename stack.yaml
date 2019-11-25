@@ -17,7 +17,19 @@ Parameters:
     Type: AWS::EC2::KeyPair::KeyName
     ConstraintDescription: Must be the name of an existing EC2 KeyPair.
 
-  InstanceType:
+  DatabaseMasterUsername:
+    Description: DatabaseMasterUsername
+    Type: String
+    ConstraintDescription: Master username for the database.
+    Default: "drupal"
+
+  DatabaseMasterPassword:
+    Description: DatabaseMasterPassword
+    Type: String
+    ConstraintDescription: Master password for the database.
+    NoEcho: true
+
+  EC2InstanceType:
     Description: EC2 instance type
     Type: String
     AllowedValues:
@@ -26,6 +38,16 @@ Parameters:
       - t2.medium
     ConstraintDescription: Must be a valid EC2 instance type.
     Default: t2.micro
+
+  RDSInstanceType:
+    Description: RDS instance type
+    Type: String
+    AllowedValues:
+      - db.t2.micro
+      - db.t2.small
+      - db.t2.medium
+    ConstraintDescription: Must be a valid RDS instance type.
+    Default: db.t2.micro
 
   VpcCIDR:
     Description: VPC CIDR
@@ -274,7 +296,7 @@ Resources:
       SubnetId: !Ref PublicSubnet1
       ImageId: !FindInMap [RegionMap, !Ref "AWS::Region", "AmazonLinuxNATHVM64"]
       InstanceType:
-        Ref: InstanceType
+        Ref: EC2InstanceType
       KeyName:
         Ref: KeyName
       SourceDestCheck: false
@@ -286,7 +308,7 @@ Resources:
       SubnetId: !Ref PublicSubnet2
       ImageId: !FindInMap [RegionMap, !Ref "AWS::Region", "AmazonLinux2HVM64"]
       InstanceType:
-        Ref: InstanceType
+        Ref: EC2InstanceType
       KeyName:
         Ref: KeyName
       SecurityGroupIds: [!Ref BastionSecurityGroup]
@@ -295,6 +317,31 @@ Resources:
     Type: AWS::EC2::EIP
     Properties:
       InstanceId: !Ref Bastion
+
+  DatabaseSubnetGroup:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: "Database subnet group for the Drupal content database."
+      DBSubnetGroupName: drupal-database-sngrp
+      SubnetIds:
+        - !Ref PrivateSubnet1
+        - !Ref PrivateSubnet2
+        - !Ref PrivateSubnet3
+
+  Database:
+    Type: AWS::RDS::DBInstance
+    DeletionPolicy: Snapshot
+    Properties:
+      AllocatedStorage: 20
+      DBInstanceClass: !Ref RDSInstanceType
+      DBInstanceIdentifier: drupal
+      Engine: MySQL
+      DBName: drupal
+      DBSubnetGroupName: !Ref DatabaseSubnetGroup
+      MasterUsername: !Ref DatabaseMasterUsername
+      MasterUserPassword: !Ref DatabaseMasterPassword
+      VPCSecurityGroups:
+        - !Ref RDSSecurityGroup
 
   DrupalLaunchTemplate:
     Type: AWS::EC2::LaunchTemplate
@@ -314,7 +361,7 @@ Resources:
       LaunchTemplateData:
         ImageId: !FindInMap [RegionMap, !Ref "AWS::Region", "AmazonLinux2HVM64"]
         InstanceType:
-          Ref: InstanceType
+          Ref: EC2InstanceType
         KeyName:
           Ref: KeyName
         SecurityGroupIds: [!Ref WebServerSecurityGroup]
@@ -375,3 +422,6 @@ Outputs:
 
   ApplicationLoadBalancerURL:
     Value: !GetAtt ApplicationLoadBalancer.DNSName
+
+  DatabaseURL:
+    Value: !GetAtt Database.Endpoint.Address
