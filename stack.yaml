@@ -375,6 +375,31 @@ Resources:
                 - -si
                 - s|var/www/html|/var/www/drupal-8.7.10|g
                 - /etc/httpd/conf/httpd.conf
+          files:
+            /var/www/drupal-8.7.10/sites/default/settings.php:
+              content: !Sub |
+                <?php
+                $databases['default']['default'] = array(
+                  'database' => 'drupal',
+                  'username' => '${DatabaseMasterUsername}',
+                  'password' => '${DatabaseMasterPassword}',
+                  'host' => '${Database.Endpoint.Address}',
+                  'port' => '3306',
+                  'driver' => 'mysql',
+                  'prefix' => '',
+                  'collation' => 'utf8mb4_general_ci',
+                );
+                $config_directories = array(); // TODO: somewhere on EFS
+                $settings['install_profile'] = 'standard';
+                $settings['hash_salt'] = ''; // TODO
+                $settings['container_yamls'][] = $app_root . '/' . $site_path . '/services.yml';
+                $settings['file_scan_ignore_directories'] = array(
+                  'node_modules',
+                  'bower_components',
+                );
+              mode: "000644"
+              owner: "root"
+              group: "root"
         start:
           services:
             sysvinit:
