@@ -412,7 +412,6 @@ Resources:
                   'collation' => 'utf8mb4_general_ci',
                 );
                 $config_directories = array(); // TODO: somewhere on EFS
-                $settings['install_profile'] = 'standard';
                 $settings['hash_salt'] = ''; // TODO
                 $settings['container_yamls'][] = $app_root . '/' . $site_path . '/services.yml';
                 $settings['file_scan_ignore_directories'] = array(
