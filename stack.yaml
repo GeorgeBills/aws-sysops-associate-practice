@@ -378,13 +378,20 @@ Resources:
               command:
                 - sed
                 - -si
-                - s|var/www/html|/var/www/drupal-8.7.10|g
+                - s|DocumentRoot "/var/www/html"|DocumentRoot "/var/www/drupal-8.7.10"|g
                 - /etc/httpd/conf/httpd.conf
           files:
             /tmp/install.cmd:
               content: |
                 sudo /usr/local/bin/drush -r /var/www/drupal-8.7.10/ site-install
                 sudo /usr/local/bin/drush -r /var/www/drupal-8.7.10/ cache-rebuild
+            /etc/httpd/conf.d/drupal.conf:
+              content: |
+                <Directory "/var/www/drupal-8.7.10">
+                  Options Indexes FollowSymLinks
+                  AllowOverride All
+                  Require all granted
+                </Directory>
             /var/www/drupal-8.7.10/sites/default/settings.php:
               content: !Sub |
                 <?php
