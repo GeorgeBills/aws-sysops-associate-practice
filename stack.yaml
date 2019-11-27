@@ -380,6 +380,12 @@ Resources:
                 - -si
                 - s|DocumentRoot "/var/www/html"|DocumentRoot "/var/www/drupal-8.7.10"|g
                 - /etc/httpd/conf/httpd.conf
+            files_dir_1_create:
+              command: mkdir /var/www/drupal-8.7.10/sites/default/files
+            files_dir_2_chgrp:
+              command: chgrp -R apache /var/www/drupal-8.7.10/sites/default/files
+            files_dir_3_chmod:
+              command: chmod -R g+w /var/www/drupal-8.7.10/sites/default/files
           files:
             /tmp/install.cmd:
               content: |
