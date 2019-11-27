@@ -389,7 +389,7 @@ Resources:
           files:
             /tmp/install.cmd:
               content: |
-                sudo /usr/local/bin/drush -r /var/www/drupal-8.7.10/ site-install
+                sudo /usr/local/bin/drush -r /var/www/drupal-8.7.10/ site-install --yes
                 sudo /usr/local/bin/drush -r /var/www/drupal-8.7.10/ cache-rebuild
             /etc/httpd/conf.d/drupal.conf:
               content: |
