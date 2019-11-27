@@ -359,6 +359,7 @@ Resources:
           packages:
             yum:
               httpd: []
+              mariadb: [] # client
               php: [7.2.24]
               php-gd: []
               php-mbstring: []
@@ -367,6 +368,10 @@ Resources:
               php-xml: []
           sources:
             /var/www: "https://ftp.drupal.org/files/projects/drupal-8.7.10.tar.gz"
+          files:
+            /usr/local/bin/drush:
+              source: https://github.com/drush-ops/drush/releases/download/8.3.2/drush.phar
+              mode: "000755" # executable
         configure:
           commands:
             update_document_root:
@@ -376,6 +381,10 @@ Resources:
                 - s|var/www/html|/var/www/drupal-8.7.10|g
                 - /etc/httpd/conf/httpd.conf
           files:
+            /tmp/install.cmd:
+              content: |
+                sudo /usr/local/bin/drush -r /var/www/drupal-8.7.10/ site-install
+                sudo /usr/local/bin/drush -r /var/www/drupal-8.7.10/ cache-rebuild
             /var/www/drupal-8.7.10/sites/default/settings.php:
               content: !Sub |
                 <?php
