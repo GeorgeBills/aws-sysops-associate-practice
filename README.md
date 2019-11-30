@@ -15,7 +15,7 @@
  - [X] RDS MySQL
  - [X] ELB
  - [X] Uploads stored in EFS
- - [ ] Sensitive parameters stored in Parameter Store
+ - [X] Sensitive parameters stored in Parameter Store
 
 ## High Availability and Scaling
 

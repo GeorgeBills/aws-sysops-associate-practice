@@ -391,7 +391,7 @@ Resources:
     Metadata:
       AWS::CloudFormation::Init:
         configSets:
-          default: [preinstall, install, configure, start]
+          default: [preinstall, install, configure, postconfigure, start]
         preinstall:
           commands:
             php_7:
@@ -457,8 +457,8 @@ Resources:
                   'prefix' => '',
                   'collation' => 'utf8mb4_general_ci',
                 );
-                $config_directories = array(); // TODO: somewhere on EFS
-                $settings['hash_salt'] = ''; // TODO
+                $config_directories = array(); // TODO
+                $settings['hash_salt'] = file_get_contents('/var/www/drupal-8.7.10/sites/default/hash_salt');
                 $settings['container_yamls'][] = $app_root . '/' . $site_path . '/services.yml';
                 $settings['file_scan_ignore_directories'] = array(
                   'node_modules',
@@ -467,6 +467,11 @@ Resources:
               mode: "000644"
               owner: "root"
               group: "root"
+        postconfigure:
+          commands:
+            set_hash_salt:
+              # it would be nicer to get this dynamically instead of hardcoding it at instance creation
+              command: aws ssm get-parameter --name drupal_hash_salt --region ap-southeast-2 --with-decryption --query Parameter.Value --output text > /var/www/drupal-8.7.10/sites/default/hash_salt
         start:
           services:
             sysvinit:
@@ -489,6 +494,8 @@ Resources:
         ImageId: !FindInMap [RegionMap, !Ref "AWS::Region", "AmazonLinux2HVM64"]
         InstanceType:
           Ref: EC2InstanceType
+        IamInstanceProfile:
+          Name: !Ref DrupalInstanceProfile
         KeyName:
           Ref: KeyName
         SecurityGroupIds: [!Ref WebServerSecurityGroup]
