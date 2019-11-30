@@ -1,0 +1,61 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: A bucket for storing log files.
+
+Parameters:
+  LogsBucketName:
+    Description: Name for the S3 bucket in which to store log files.
+    Type: String
+    AllowedPattern: "[a-z0-9\\-\\.]{3,63}"
+
+Resources:
+  LogsBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref LogsBucketName
+      AccessControl: LogDeliveryWrite
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+
+  LogsBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref LogsBucketName
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          # both cloudtrail and config can see the bucket and the bucket acl
+          - Effect: Allow
+            Principal:
+              Service:
+                - config.amazonaws.com
+                - cloudtrail.amazonaws.com
+            Action:
+              - s3:GetBucketAcl
+              - s3:ListBucket
+            Resource: !Sub arn:aws:s3:::${LogsBucketName}
+          # cloudtrail can write to the cloudtrail subpath
+          - Effect: Allow
+            Principal:
+              Service: cloudtrail.amazonaws.com
+            Action: s3:PutObject
+            Resource: !Sub arn:aws:s3:::${LogsBucketName}/AWSLogs/${AWS::AccountId}/CloudTrail*
+            Condition:
+              StringEquals:
+                s3:x-amz-acl: bucket-owner-full-control
+          # config can write to the config subpath
+          - Effect: Allow
+            Principal:
+              Service:
+                - config.amazonaws.com
+            Action: s3:PutObject
+            Resource: !Sub arn:aws:s3:::${LogsBucketName}/AWSLogs/${AWS::AccountId}/Config/*
+            Condition:
+              StringEquals:
+                s3:x-amz-acl: bucket-owner-full-control
