@@ -14,7 +14,7 @@
  - [X] EC2 bastion host
  - [X] RDS MySQL
  - [X] ELB
- - [ ] Uploads stored in S3
+ - [ ] Uploads stored in EFS
 
 ## High Availability and Scaling
 

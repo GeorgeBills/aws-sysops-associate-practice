@@ -288,6 +288,18 @@ Resources:
           ToPort: 65535
           CidrIp: !Ref VpcCIDR
 
+  EFSSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: "efs-sg"
+      GroupDescription: "Allows NFS traffic from internal."
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 2049
+          ToPort: 2049
+          CidrIp: !Ref VpcCIDR
+
   # HOSTS
 
   NAT:
@@ -366,6 +378,7 @@ Resources:
               php-mysqlnd: []
               php-opcache: []
               php-xml: []
+              amazon-efs-utils: []
           sources:
             /var/www: "https://ftp.drupal.org/files/projects/drupal-8.7.10.tar.gz"
           files:
@@ -450,6 +463,33 @@ Resources:
           Fn::Base64: !Sub |
             #!/bin/bash -ex
             /opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource DrupalLaunchTemplate --region ${AWS::Region}
+
+  DrupalSharedFiles:
+    Type: AWS::EFS::FileSystem
+
+  DrupalSharedFilesMount1:
+    Type: AWS::EFS::MountTarget
+    Properties:
+      FileSystemId: !Ref DrupalSharedFiles
+      SubnetId: !Ref PrivateSubnet1
+      SecurityGroups:
+        - !Ref EFSSecurityGroup
+
+  DrupalSharedFilesMount2:
+    Type: AWS::EFS::MountTarget
+    Properties:
+      FileSystemId: !Ref DrupalSharedFiles
+      SubnetId: !Ref PrivateSubnet2
+      SecurityGroups:
+        - !Ref EFSSecurityGroup
+
+  DrupalSharedFilesMount3:
+    Type: AWS::EFS::MountTarget
+    Properties:
+      FileSystemId: !Ref DrupalSharedFiles
+      SubnetId: !Ref PrivateSubnet3
+      SecurityGroups:
+        - !Ref EFSSecurityGroup
 
   DrupalAutoscalingGroup:
     Type: AWS::AutoScaling::AutoScalingGroup
