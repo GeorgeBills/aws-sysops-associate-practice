@@ -17,6 +17,11 @@ Parameters:
     Type: AWS::EC2::KeyPair::KeyName
     ConstraintDescription: Must be the name of an existing EC2 KeyPair.
 
+  LogsBucketName:
+    Description: Name for the S3 bucket in which to store log files.
+    Type: String
+    AllowedPattern: "[a-z0-9\\-\\.]{3,63}"
+
   DatabaseMasterUsername:
     Description: DatabaseMasterUsername
     Type: String
@@ -551,6 +556,11 @@ Resources:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
       Name: drupal-alb
+      LoadBalancerAttributes:
+        - Key: access_logs.s3.enabled
+          Value: true
+        - Key: access_logs.s3.bucket
+          Value: !Ref LogsBucketName
       SecurityGroups: [!Ref ApplicationLoadBalancerSecurityGroup]
       Subnets:
         - !Ref PublicSubnet1

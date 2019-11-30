@@ -1,7 +1,7 @@
 ## Useful commands
 
  * Create initial stack, update stack:
-   `aws cloudformation deploy --template-file stack.yaml --stack-name mydrupalstack --parameter-overrides KeyName=MyKeyPair MyHomeCIDR=203.0.113.123/0 DatabaseMasterPassword=my53cr37p455w0rd --capabilities CAPABILITY_NAMED_IAM`
+   `aws cloudformation deploy --template-file stack.yaml --stack-name mydrupalstack --parameter-overrides KeyName=MyKeyPair MyHomeCIDR=203.0.113.123/0 DatabaseMasterPassword=my53cr37p455w0rd LogsBucketName=mys3logsbucket --capabilities CAPABILITY_NAMED_IAM`
  * Delete stack and all of its resources:
    `aws cloudformation delete-stack --stack-name mydrupalstack`
 
@@ -53,7 +53,7 @@
 
 ## Monitoring
 
- - [ ] ELB logs saved to S3
+ - [X] ELB logs saved to S3
  - [ ] CloudTrail logs saved to S3
  - [ ] All resources tagged and displayed within a resource group
  - [ ] CloudWatch dashboard with [baseline monitoring](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/monitoring_ec2.html)
