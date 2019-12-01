@@ -22,3 +22,10 @@ Resources:
         BlockPublicPolicy: true
         IgnorePublicAcls: true
         RestrictPublicBuckets: true
+      LifecycleConfiguration:
+        Rules:
+          - Id: delete-unsaved-query-results
+            ExpirationInDays: 7
+            NoncurrentVersionExpirationInDays: 7
+            Prefix: Unsaved/
+            Status: Enabled
