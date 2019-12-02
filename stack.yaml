@@ -320,6 +320,8 @@ Resources:
                 - ec2.amazonaws.com
             Action:
               - sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy
       Policies:
         - PolicyName: GetDrupalHashSalt
           PolicyDocument:
@@ -415,6 +417,8 @@ Resources:
               php-opcache: []
               php-xml: []
               amazon-efs-utils: []
+            rpm:
+              amazon-cloudwatch-agent: "https://s3.amazonaws.com/amazoncloudwatch-agent/amazon_linux/amd64/latest/amazon-cloudwatch-agent.rpm"
           sources:
             /var/www: "https://ftp.drupal.org/files/projects/drupal-8.7.10.tar.gz"
           files:
@@ -442,6 +446,17 @@ Resources:
               content: |
                 sudo /usr/local/bin/drush -r /var/www/drupal-8.7.10/ site-install --yes
                 sudo /usr/local/bin/drush -r /var/www/drupal-8.7.10/ cache-rebuild
+            /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json:
+              content: |
+                {
+                    "metrics": {
+                        "metrics_collected": {
+                            "disk": { "measurement": [ "used_percent" ] },
+                            "swap": { "measurement": [ "used_percent" ] },
+                            "mem": { "measurement": [ "used_percent" ] }
+                        }
+                    }
+                }
             /etc/httpd/conf.d/drupal.conf:
               content: |
                 <Directory "/var/www/drupal-8.7.10">
@@ -493,6 +508,9 @@ Resources:
                     - php-mysqlnd
                     - php-opcache
                     - php-xml
+          commands:
+            start_cloudwatch_agent:
+              command: /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c file:/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json -s
     Properties:
       LaunchTemplateName: "drupal-lt"
       LaunchTemplateData:
