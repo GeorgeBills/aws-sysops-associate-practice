@@ -427,7 +427,7 @@ Resources:
             files_dir_1_create:
               command: mkdir /var/www/drupal-8.7.10/sites/default/files
             files_dir_2_mount:
-              command: mount -t efs fs-81eedfb8:/ /var/www/drupal-8.7.10/sites/default/files
+              command: !Sub mount -t efs ${DrupalSharedFiles}:/ /var/www/drupal-8.7.10/sites/default/files
             files_dir_3_chgrp:
               command: chgrp -R apache /var/www/drupal-8.7.10/sites/default/files
             files_dir_4_chmod:
