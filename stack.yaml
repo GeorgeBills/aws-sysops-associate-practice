@@ -457,7 +457,10 @@ Resources:
                             "InstanceType": "${aws:InstanceType}"
                         },
                         "metrics_collected": {
-                            "disk": { "measurement": [ "used_percent" ] },
+                            "disk": {
+                              "resources": [ "/" ],
+                              "measurement": [ "used_percent" ] 
+                            },
                             "swap": { "measurement": [ "used_percent" ] },
                             "mem": { "measurement": [ "used_percent" ] }
                         }
