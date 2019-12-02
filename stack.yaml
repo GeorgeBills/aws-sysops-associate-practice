@@ -447,14 +447,14 @@ Resources:
                 sudo /usr/local/bin/drush -r /var/www/drupal-8.7.10/ site-install --yes
                 sudo /usr/local/bin/drush -r /var/www/drupal-8.7.10/ cache-rebuild
             /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json:
-              content: |
+              content: !Sub |
                 {
                     "metrics": {
                         "append_dimensions": {
-                            "AutoScalingGroupName": "${aws:AutoScalingGroupName}",
-                            "ImageId": "${aws:ImageId}",
-                            "InstanceId": "${aws:InstanceId}",
-                            "InstanceType": "${aws:InstanceType}"
+                            "AutoScalingGroupName": "${!aws:AutoScalingGroupName}",
+                            "ImageId": "${!aws:ImageId}",
+                            "InstanceId": "${!aws:InstanceId}",
+                            "InstanceType": "${!aws:InstanceType}"
                         },
                         "metrics_collected": {
                             "disk": {
@@ -464,6 +464,23 @@ Resources:
                             "swap": { "measurement": [ "used_percent" ] },
                             "mem": { "measurement": [ "used_percent" ] }
                         }
+                    },
+                    "logs": {
+                        "logs_collected": {
+                            "files": {
+                                "collect_list": [
+                                    {
+                                        "log_group_name": "apache/access",
+                                        "file_path": "/var/log/httpd/access_log*"
+                                    },
+                                    {
+                                        "log_group_name": "apache/error",
+                                        "file_path": "/var/log/httpd/error_log*"
+                                    }
+                                ]
+                            }
+                        },
+                        "log_stream_name": "{instance_id}"
                     }
                 }
             /etc/httpd/conf.d/drupal.conf:
