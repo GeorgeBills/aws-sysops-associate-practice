@@ -71,7 +71,7 @@
  - [X] Ship Apache logs to CloudWatch logs
  - [ ] Alarm on unexpectedly high billing
  - [X] Alarm on zero healthy hosts
- - [ ] Compliance check on worldwide port 22 access
+ - [X] Compliance check on worldwide port 22 access
 
 ## Tasks
 
