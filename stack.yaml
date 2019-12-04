@@ -12,6 +12,11 @@ Parameters:
     Type: String
     ConstraintDescription: My home CIDR range.
 
+  MyMobilePhoneNumber:
+    Type: String
+    ConstraintDescription: My mobile phone number.
+    AllowedPattern: "\\+614\\d{8}"
+
   KeyName:
     Description: KeyPair
     Type: AWS::EC2::KeyPair::KeyName
@@ -629,6 +634,33 @@ Resources:
       Port: 80
       Protocol: HTTP
       VpcId: !Ref VPC
+
+  ZeroHealthyHostsAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: !Sub ${AWS::StackName}-ZeroHealthyHosts
+      AlarmActions:
+        - !Ref ZeroHealthyHostsAlarmTopic
+      Dimensions:
+        - Name: TargetGroup
+          Value: targetgroup/drupal-tg/df7202616d0bed71
+        - Name: LoadBalancer
+          Value: app/drupal-alb/ee7e1d3d3c281893
+      MetricName: HealthyHostCount
+      EvaluationPeriods: 1
+      ComparisonOperator: LessThanOrEqualToThreshold
+      Namespace: AWS/ApplicationELB
+      Period: 120
+      Statistic: Average
+      Threshold: 0
+
+  ZeroHealthyHostsAlarmTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: !Sub ${AWS::StackName}-ZeroHealthyHostsAlarm
+      Subscription:
+        - Protocol: sms
+          Endpoint: !Ref MyMobilePhoneNumber
 
 Outputs:
   BastionIP:

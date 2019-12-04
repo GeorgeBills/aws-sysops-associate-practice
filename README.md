@@ -1,7 +1,7 @@
 ## Useful commands
 
  * Create initial stack, update stack:
-   `aws cloudformation deploy --template-file stack.yaml --stack-name mydrupalstack --parameter-overrides KeyName=MyKeyPair MyHomeCIDR=203.0.113.123/0 DatabaseMasterPassword=my53cr37p455w0rd LogsBucketName=mys3logsbucket --capabilities CAPABILITY_NAMED_IAM`
+   `aws cloudformation deploy --template-file stack.yaml --stack-name mydrupalstack --parameter-overrides KeyName=MyKeyPair MyHomeCIDR=203.0.113.123/0 DatabaseMasterPassword=my53cr37p455w0rd LogsBucketName=mys3logsbucket MyMobilePhoneNumber=+61412345678 --capabilities CAPABILITY_NAMED_IAM`
  * Delete stack and all of its resources:
    `aws cloudformation delete-stack --stack-name mydrupalstack`
 
@@ -66,7 +66,7 @@
     - [X] With dimensions to allow easily filtering metrics to just the webservers
  - [X] Ship Apache logs to CloudWatch logs
  - [ ] Alarm on unexpectedly high billing
- - [ ] Alarm on ELB HealthyHostCount = 0
+ - [X] Alarm on zero healthy hosts
  - [ ] Compliance check on worldwide port 22 access
 
 ## Tasks
