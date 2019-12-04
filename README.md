@@ -5,6 +5,11 @@
  * Delete stack and all of its resources:
    `aws cloudformation delete-stack --stack-name mydrupalstack`
 
+## Pre
+
+ - [X] CloudTrail logs saved to S3
+ - [X] Config snapshots saved to S3
+
 ## Web application
 
  - [X] EC2 web servers (Drupal)
@@ -54,7 +59,6 @@
 ## Monitoring
 
  - [X] ELB logs saved to S3
- - [ ] CloudTrail logs saved to S3
  - [ ] All resources tagged and displayed within a resource group
  - [ ] CloudWatch dashboard
     - [ ] [baseline monitoring](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/monitoring_ec2.html)
