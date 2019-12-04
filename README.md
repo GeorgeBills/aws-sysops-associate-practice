@@ -60,9 +60,7 @@
     - [ ] [baseline monitoring](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/monitoring_ec2.html)
     - [X] Plus disk and memory usage custom metrics
     - [X] With dimensions to allow easily filtering metrics to just the webservers
- - [X] Ship system logs from web servers...
-     - [X] CloudWatch logs
-     - [ ] S3
+ - [X] Ship Apache logs to CloudWatch logs
  - [ ] Alarm on unexpectedly high billing
  - [ ] Alarm on ELB HealthyHostCount = 0
  - [ ] Compliance check on worldwide port 22 access
@@ -71,3 +69,4 @@
 
  - [ ] Use Systems Manager to update Yum patches for all instances
  - [X] Apply stack via AWS CLI
+ - [ ] Export CloudWatch logs to S3

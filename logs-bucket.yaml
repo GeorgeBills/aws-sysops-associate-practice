@@ -42,6 +42,7 @@ Resources:
               Service:
                 - config.amazonaws.com
                 - cloudtrail.amazonaws.com
+                - !Sub logs.${AWS::Region}.amazonaws.com
             Action:
               - s3:GetBucketAcl
               - s3:ListBucket
@@ -76,3 +77,12 @@ Resources:
                       !FindInMap [RegionMap, !Ref "AWS::Region", ELBAccountId]
             Action: s3:PutObject
             Resource: !Sub arn:aws:s3:::${LogsBucketName}/AWSLogs/${AWS::AccountId}/*
+          # cloudwatch logs service can write to its designated subpath
+          - Effect: Allow
+            Principal:
+              Service: !Sub logs.${AWS::Region}.amazonaws.com
+            Action: s3:PutObject
+            Resource: !Sub "arn:aws:s3:::${LogsBucketName}/exportedlogs/*"
+            Condition:
+              StringEquals:
+                s3:x-amz-acl: "bucket-owner-full-control"
