@@ -74,3 +74,4 @@
  - [ ] Use Systems Manager to update Yum patches for all instances
  - [X] Apply stack via AWS CLI
  - [ ] Export CloudWatch logs to S3
+ - [X] Query logs with Athena
