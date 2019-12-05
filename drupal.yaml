@@ -329,6 +329,19 @@ Resources:
         To: 443
       RuleAction: allow
 
+  PublicNACLSSHToPrivate:
+    Type: AWS::EC2::NetworkAclEntry
+    Properties:
+      RuleNumber: 2300
+      CidrBlock: !Ref VpcCIDR
+      NetworkAclId: !Ref PublicNACL
+      Protocol: 6 # tcp
+      Egress: true
+      PortRange:
+        From: 22
+        To: 22
+      RuleAction: allow
+
   PrivateNACL:
     Type: AWS::EC2::NetworkAcl
     Properties:
