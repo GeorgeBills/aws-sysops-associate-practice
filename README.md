@@ -69,7 +69,7 @@
     - [X] Plus disk and memory usage custom metrics
     - [X] With dimensions to allow easily filtering metrics to just the webservers
  - [X] Ship Apache logs to CloudWatch logs
- - [ ] Alarm on unexpectedly high billing
+ - [X] Alarm on unexpectedly high billing (manually)
  - [X] Alarm on zero healthy hosts
  - [X] Compliance check on worldwide port 22 access
 
