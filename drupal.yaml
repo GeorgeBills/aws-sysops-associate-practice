@@ -290,6 +290,18 @@ Resources:
         To: 443
       RuleAction: allow
 
+  PublicNACLEphemerealIn: # incoming in response to outgoing
+    Type: AWS::EC2::NetworkAclEntry
+    Properties:
+      RuleNumber: 400
+      CidrBlock: 0.0.0.0/0 # both from HTTP/S out and SSH, HTTP to the private
+      NetworkAclId: !Ref PublicNACL
+      Protocol: 6 # tcp
+      PortRange:
+        From: 1024
+        To: 65535
+      RuleAction: allow
+
   PublicNACLEphemerealOut: # outgoing in response to incoming
     Type: AWS::EC2::NetworkAclEntry
     Properties:
@@ -399,6 +411,18 @@ Resources:
       PortRange:
         From: 3306 # MySQL
         To: 3306
+      RuleAction: allow
+
+  PrivateNACLEphemerealIn:
+    Type: AWS::EC2::NetworkAclEntry
+    Properties:
+      RuleNumber: 400
+      CidrBlock: !Ref VpcCIDR
+      NetworkAclId: !Ref PrivateNACL
+      Protocol: 6 # tcp
+      PortRange:
+        From: 1024
+        To: 65535
       RuleAction: allow
 
   PrivateNACLEphemerealOut: # outgoing in response to incoming
