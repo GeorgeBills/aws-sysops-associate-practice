@@ -63,9 +63,9 @@
 ## Monitoring
 
  - [X] ELB logs saved to S3
- - [ ] All resources tagged and displayed within a resource group
- - [ ] CloudWatch dashboard
-    - [ ] [baseline monitoring](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/monitoring_ec2.html)
+ - [X] All resources tagged and displayed within a resource group (manually)
+ - [X] CloudWatch dashboard (manually)
+    - [X] [baseline monitoring](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/monitoring_ec2.html)
     - [X] Plus disk and memory usage custom metrics
     - [X] With dimensions to allow easily filtering metrics to just the webservers
  - [X] Ship Apache logs to CloudWatch logs
