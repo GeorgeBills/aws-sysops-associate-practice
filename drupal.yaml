@@ -236,6 +236,24 @@ Resources:
     Properties:
       VpcId: !Ref VPC
 
+  PublicSubnet1NACL:
+    Type: AWS::EC2::SubnetNetworkAclAssociation
+    Properties:
+      NetworkAclId: !Ref PublicNACL
+      SubnetId: !Ref PublicSubnet1
+
+  PublicSubnet2NACL:
+    Type: AWS::EC2::SubnetNetworkAclAssociation
+    Properties:
+      NetworkAclId: !Ref PublicNACL
+      SubnetId: !Ref PublicSubnet2
+
+  PublicSubnet3NACL:
+    Type: AWS::EC2::SubnetNetworkAclAssociation
+    Properties:
+      NetworkAclId: !Ref PublicNACL
+      SubnetId: !Ref PublicSubnet3
+
   PublicNACLSSHIn:
     Type: AWS::EC2::NetworkAclEntry
     Properties:
@@ -315,6 +333,24 @@ Resources:
     Type: AWS::EC2::NetworkAcl
     Properties:
       VpcId: !Ref VPC
+
+  PrivateSubnet1NACL:
+    Type: AWS::EC2::SubnetNetworkAclAssociation
+    Properties:
+      NetworkAclId: !Ref PrivateNACL
+      SubnetId: !Ref PrivateSubnet1
+
+  PrivateSubnet2NACL:
+    Type: AWS::EC2::SubnetNetworkAclAssociation
+    Properties:
+      NetworkAclId: !Ref PrivateNACL
+      SubnetId: !Ref PrivateSubnet2
+
+  PrivateSubnet3NACL:
+    Type: AWS::EC2::SubnetNetworkAclAssociation
+    Properties:
+      NetworkAclId: !Ref PrivateNACL
+      SubnetId: !Ref PrivateSubnet3
 
   PrivateNACLSSHIn:
     Type: AWS::EC2::NetworkAclEntry
