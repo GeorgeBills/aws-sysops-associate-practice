@@ -48,7 +48,7 @@
  - [ ] Resources provisioned by dedicated user account
  - [ ] IAM authentication to RDS
  - [ ] RDS encrypted at rest
- - [ ] NACL to block SSH and RDS from anything except your home IP
+ - [X] NACL per [VPC recommended NACL rules](https://docs.aws.amazon.com/vpc/latest/userguide/vpc-recommended-nacl-rules.html#nacl-rules-scenario-2)
 
 ## Networking
 
