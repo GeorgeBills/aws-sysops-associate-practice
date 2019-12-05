@@ -1,7 +1,7 @@
 ## Useful commands
 
  * Create initial stack, update stack:
-   `aws cloudformation deploy --template-file stack.yaml --stack-name mydrupalstack --parameter-overrides KeyName=MyKeyPair MyHomeCIDR=203.0.113.123/0 DatabaseMasterPassword=my53cr37p455w0rd LogsBucketName=mys3logsbucket MyMobilePhoneNumber=+61412345678 --capabilities CAPABILITY_NAMED_IAM`
+   `aws cloudformation deploy --template-file drupal.yaml --stack-name mydrupalstack --parameter-overrides KeyName=MyKeyPair MyHomeCIDR=203.0.113.123/0 DatabaseMasterPassword=my53cr37p455w0rd LogsBucketName=mys3logsbucket MyMobilePhoneNumber=+61412345678 --capabilities CAPABILITY_NAMED_IAM`
  * Delete stack and all of its resources:
    `aws cloudformation delete-stack --stack-name mydrupalstack`
 
