@@ -1,0 +1,31 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: A bucket for storing Athena query results.
+
+Parameters:
+  AthenaQueryResultsBucketName:
+    Description: Name for the S3 bucket in which to store Athena query results.
+    Type: String
+    AllowedPattern: "[a-z0-9\\-\\.]{3,63}"
+
+Resources:
+  AthenaQueryResultsBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref AthenaQueryResultsBucketName
+      AccessControl: Private
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      LifecycleConfiguration:
+        Rules:
+          - Id: delete-unsaved-query-results
+            ExpirationInDays: 7
+            NoncurrentVersionExpirationInDays: 7
+            Prefix: Unsaved/
+            Status: Enabled

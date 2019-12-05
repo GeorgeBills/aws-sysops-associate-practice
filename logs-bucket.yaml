@@ -1,6 +1,12 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Description: A bucket for storing log files.
 
+Mappings:
+  # https://docs.aws.amazon.com/elasticloadbalancing/latest/classic/enable-access-logs.html#attach-bucket-policy
+  RegionMap:
+    ap-southeast-2:
+      ELBAccountId: 783225319266
+
 Parameters:
   LogsBucketName:
     Description: Name for the S3 bucket in which to store log files.
@@ -36,6 +42,7 @@ Resources:
               Service:
                 - config.amazonaws.com
                 - cloudtrail.amazonaws.com
+                - !Sub logs.${AWS::Region}.amazonaws.com
             Action:
               - s3:GetBucketAcl
               - s3:ListBucket
@@ -59,3 +66,23 @@ Resources:
             Condition:
               StringEquals:
                 s3:x-amz-acl: bucket-owner-full-control
+          # the elb account can write to the logs dir for our account
+          # https://docs.aws.amazon.com/elasticloadbalancing/latest/classic/enable-access-logs.html#attach-bucket-policy
+          - Effect: Allow
+            Principal:
+              AWS:
+                Fn::Sub:
+                  - arn:aws:iam::${ELBAccountId}:root
+                  - ELBAccountId:
+                      !FindInMap [RegionMap, !Ref "AWS::Region", ELBAccountId]
+            Action: s3:PutObject
+            Resource: !Sub arn:aws:s3:::${LogsBucketName}/AWSLogs/${AWS::AccountId}/*
+          # cloudwatch logs service can write to its designated subpath
+          - Effect: Allow
+            Principal:
+              Service: !Sub logs.${AWS::Region}.amazonaws.com
+            Action: s3:PutObject
+            Resource: !Sub "arn:aws:s3:::${LogsBucketName}/exportedlogs/*"
+            Condition:
+              StringEquals:
+                s3:x-amz-acl: "bucket-owner-full-control"
