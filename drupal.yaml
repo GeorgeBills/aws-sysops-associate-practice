@@ -464,6 +464,63 @@ Resources:
         To: 443
       RuleAction: allow
 
+  # NETWORKING: WAF
+
+  XssMatchSet:
+    Type: AWS::WAF::XssMatchSet
+    Properties:
+      Name: "XSS matcher"
+      XssMatchTuples:
+        - FieldToMatch:
+            Type: QUERY_STRING
+          TextTransformation: URL_DECODE
+
+  XssRule:
+    Type: AWS::WAF::Rule
+    Properties:
+      Name: XSSRule
+      MetricName: XSSRule
+      Predicates:
+        - DataId: !Ref XssMatchSet
+          Negated: false
+          Type: XssMatch
+
+  SqlInjectionMatchSet:
+    Type: AWS::WAF::SqlInjectionMatchSet
+    Properties:
+      Name: "SQLi matcher"
+      SqlInjectionMatchTuples:
+        - FieldToMatch:
+            Type: QUERY_STRING
+          TextTransformation: URL_DECODE
+
+  SqlInjectionRule:
+    Type: AWS::WAF::Rule
+    Properties:
+      Name: SQLiRule
+      MetricName: SQLiRule
+      Predicates:
+        - DataId: !Ref SqlInjectionMatchSet
+          Negated: false
+          Type: SqlInjectionMatch
+
+  WebACL:
+    Type: AWS::WAF::WebACL
+    Properties:
+      DefaultAction:
+        Type: ALLOW
+      Name: !Sub ${AWS::StackName}WebACL
+      MetricName: !Sub ${AWS::StackName}WebACL
+      Rules:
+        - Action:
+            Type: BLOCK
+          Priority: 1
+          RuleId: !Ref XssRule
+        - Action:
+            Type: BLOCK
+          Priority: 2
+          RuleId: !Ref SqlInjectionRule
+
   # SECURITY GROUPS
 
   ApplicationLoadBalancerSecurityGroup:
