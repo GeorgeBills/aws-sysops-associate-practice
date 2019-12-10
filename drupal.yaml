@@ -724,6 +724,8 @@ Resources:
               source: https://github.com/drush-ops/drush/releases/download/8.3.2/drush.phar
               mode: "000755" # executable
         configure:
+          sources:
+            /etc/ssl/certs/rds-combined-ca-bundle.pem: "https://s3.amazonaws.com/rds-downloads/rds-combined-ca-bundle.pem"
           commands:
             update_document_root:
               command:
@@ -800,6 +802,9 @@ Resources:
                   'driver' => 'mysql',
                   'prefix' => '',
                   'collation' => 'utf8mb4_general_ci',
+                  'pdo' => array(
+                    PDO::MYSQL_ATTR_SSL_CA => '/etc/ssl/certs/rds-combined-ca-bundle.pem',
+                  ),
                 );
                 $config_directories = array(); // TODO
                 $settings['hash_salt'] = file_get_contents('/var/www/drupal-8.7.10/sites/default/hash_salt');
