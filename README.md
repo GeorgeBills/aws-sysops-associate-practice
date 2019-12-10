@@ -45,7 +45,6 @@
 
  - [ ] ACM certificate provisioned on the ELB
  - [X] [Basic WAF](https://aws.amazon.com/premiumsupport/knowledge-center/waf-block-common-attacks/)
- - [ ] IAM authentication to RDS
  - [X] Encryption in transit to RDS
  - [X] RDS encrypted at rest
  - [X] NACL per [VPC recommended NACL rules](https://docs.aws.amazon.com/vpc/latest/userguide/vpc-recommended-nacl-rules.html#nacl-rules-scenario-2)
