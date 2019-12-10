@@ -22,19 +22,24 @@
  - [X] Uploads stored in EFS
  - [X] Sensitive parameters stored in Parameter Store
 
-## High Availability and Scaling
+## High Availability
 
  - [ ] Multi-AZ RDS
- - [ ] Read replicas for RDS
- - [ ] ElastiCache cluster to cache database queries
- - [ ] Autoscale target group
- - [ ] CloudFront CDN
-   - [ ] Static asset (e.g. images, CSS, JS) caching with a high TTL
-   - [ ] Dynamic asset (e.g. webpage) caching with a low TTL
  - [ ] Failover (via Route 53) to a static page in S3 if ELB unhealthy
  - [ ] Event and notification on RDS failover to secondary
  - [ ] Automated backups for RDS
  - [ ] Turn on MFA delete and versioning for logs bucket
+ - [ ] Use NAT gateway if prod
+
+## Scaling
+
+ - [ ] Read replicas for RDS
+ - [ ] ElastiCache cluster to cache database queries
+ - [ ] Autoscale target group
+   - [ ] Use lifecycle hooks to only bring instances into service once everything is running
+ - [ ] CloudFront CDN
+   - [ ] Static asset (e.g. images, CSS, JS) caching with a high TTL
+   - [ ] Dynamic asset (e.g. webpage) caching with a low TTL
 
 ## Security
 
