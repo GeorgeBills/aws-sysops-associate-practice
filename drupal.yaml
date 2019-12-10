@@ -53,11 +53,12 @@ Parameters:
     Description: RDS instance type
     Type: String
     AllowedValues:
-      - db.t2.micro
+      # must be at least t2.small to support encryption at rest
+      # https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Overview.Encryption.html#Overview.Encryption.Availability
       - db.t2.small
       - db.t2.medium
     ConstraintDescription: Must be a valid RDS instance type.
-    Default: db.t2.micro
+    Default: db.t2.small
 
   VpcCIDR:
     Description: VPC CIDR
@@ -688,6 +689,7 @@ Resources:
       DBSubnetGroupName: !Ref DatabaseSubnetGroup
       MasterUsername: !Ref DatabaseMasterUsername
       MasterUserPassword: !Ref DatabaseMasterPassword
+      StorageEncrypted: true
       VPCSecurityGroups:
         - !Ref RDSSecurityGroup
 
