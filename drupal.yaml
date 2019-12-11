@@ -53,11 +53,12 @@ Parameters:
     Description: RDS instance type
     Type: String
     AllowedValues:
-      - db.t2.micro
+      # must be at least t2.small to support encryption at rest
+      # https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Overview.Encryption.html#Overview.Encryption.Availability
       - db.t2.small
       - db.t2.medium
     ConstraintDescription: Must be a valid RDS instance type.
-    Default: db.t2.micro
+    Default: db.t2.small
 
   VpcCIDR:
     Description: VPC CIDR
@@ -228,6 +229,299 @@ Resources:
       RouteTableId: !Ref PublicRouteTable
       SubnetId: !Ref PublicSubnet3
 
+  # NETWORKING: NACL
+  # https://docs.aws.amazon.com/vpc/latest/userguide/vpc-recommended-nacl-rules.html#nacl-rules-scenario-2
+
+  PublicNACL:
+    Type: AWS::EC2::NetworkAcl
+    Properties:
+      VpcId: !Ref VPC
+
+  PublicSubnet1NACL:
+    Type: AWS::EC2::SubnetNetworkAclAssociation
+    Properties:
+      NetworkAclId: !Ref PublicNACL
+      SubnetId: !Ref PublicSubnet1
+
+  PublicSubnet2NACL:
+    Type: AWS::EC2::SubnetNetworkAclAssociation
+    Properties:
+      NetworkAclId: !Ref PublicNACL
+      SubnetId: !Ref PublicSubnet2
+
+  PublicSubnet3NACL:
+    Type: AWS::EC2::SubnetNetworkAclAssociation
+    Properties:
+      NetworkAclId: !Ref PublicNACL
+      SubnetId: !Ref PublicSubnet3
+
+  PublicNACLSSHIn:
+    Type: AWS::EC2::NetworkAclEntry
+    Properties:
+      RuleNumber: 100
+      CidrBlock: !Ref MyHomeCIDR
+      NetworkAclId: !Ref PublicNACL
+      Protocol: 6 # tcp
+      PortRange:
+        From: 22
+        To: 22
+      RuleAction: allow
+
+  PublicNACLHTTPIn:
+    Type: AWS::EC2::NetworkAclEntry
+    Properties:
+      RuleNumber: 200
+      CidrBlock: 0.0.0.0/0
+      NetworkAclId: !Ref PublicNACL
+      Protocol: 6 # tcp
+      PortRange:
+        From: 80
+        To: 80
+      RuleAction: allow
+
+  PublicNACLHTTPSIn:
+    Type: AWS::EC2::NetworkAclEntry
+    Properties:
+      RuleNumber: 300
+      CidrBlock: 0.0.0.0/0
+      NetworkAclId: !Ref PublicNACL
+      Protocol: 6 # tcp
+      PortRange:
+        From: 443
+        To: 443
+      RuleAction: allow
+
+  PublicNACLEphemerealIn: # incoming in response to outgoing
+    Type: AWS::EC2::NetworkAclEntry
+    Properties:
+      RuleNumber: 400
+      CidrBlock: 0.0.0.0/0 # both from HTTP/S out and SSH, HTTP to the private
+      NetworkAclId: !Ref PublicNACL
+      Protocol: 6 # tcp
+      PortRange:
+        From: 1024
+        To: 65535
+      RuleAction: allow
+
+  PublicNACLEphemerealOut: # outgoing in response to incoming
+    Type: AWS::EC2::NetworkAclEntry
+    Properties:
+      RuleNumber: 2000
+      CidrBlock: 0.0.0.0/0
+      NetworkAclId: !Ref PublicNACL
+      Protocol: 6 # tcp
+      Egress: true
+      PortRange:
+        From: 1024
+        To: 65535
+      RuleAction: allow
+
+  PublicNACLHTTPOut: # yum updates, etc
+    Type: AWS::EC2::NetworkAclEntry
+    Properties:
+      RuleNumber: 2100
+      CidrBlock: 0.0.0.0/0
+      NetworkAclId: !Ref PublicNACL
+      Protocol: 6 # tcp
+      Egress: true
+      PortRange:
+        From: 80
+        To: 80
+      RuleAction: allow
+
+  PublicNACLHTTPSOut: # yum updates, etc
+    Type: AWS::EC2::NetworkAclEntry
+    Properties:
+      RuleNumber: 2200
+      CidrBlock: 0.0.0.0/0
+      NetworkAclId: !Ref PublicNACL
+      Protocol: 6 # tcp
+      Egress: true
+      PortRange:
+        From: 443
+        To: 443
+      RuleAction: allow
+
+  PublicNACLSSHToPrivate:
+    Type: AWS::EC2::NetworkAclEntry
+    Properties:
+      RuleNumber: 2300
+      CidrBlock: !Ref VpcCIDR
+      NetworkAclId: !Ref PublicNACL
+      Protocol: 6 # tcp
+      Egress: true
+      PortRange:
+        From: 22
+        To: 22
+      RuleAction: allow
+
+  PrivateNACL:
+    Type: AWS::EC2::NetworkAcl
+    Properties:
+      VpcId: !Ref VPC
+
+  PrivateSubnet1NACL:
+    Type: AWS::EC2::SubnetNetworkAclAssociation
+    Properties:
+      NetworkAclId: !Ref PrivateNACL
+      SubnetId: !Ref PrivateSubnet1
+
+  PrivateSubnet2NACL:
+    Type: AWS::EC2::SubnetNetworkAclAssociation
+    Properties:
+      NetworkAclId: !Ref PrivateNACL
+      SubnetId: !Ref PrivateSubnet2
+
+  PrivateSubnet3NACL:
+    Type: AWS::EC2::SubnetNetworkAclAssociation
+    Properties:
+      NetworkAclId: !Ref PrivateNACL
+      SubnetId: !Ref PrivateSubnet3
+
+  PrivateNACLSSHIn:
+    Type: AWS::EC2::NetworkAclEntry
+    Properties:
+      RuleNumber: 100
+      CidrBlock: !Ref VpcCIDR
+      NetworkAclId: !Ref PrivateNACL
+      Protocol: 6 # tcp
+      PortRange:
+        From: 22
+        To: 22
+      RuleAction: allow
+
+  PrivateNACLHTTPIn:
+    Type: AWS::EC2::NetworkAclEntry
+    Properties:
+      RuleNumber: 200
+      CidrBlock: !Ref VpcCIDR
+      NetworkAclId: !Ref PrivateNACL
+      Protocol: 6 # tcp
+      PortRange:
+        From: 80
+        To: 80
+      RuleAction: allow
+
+  PrivateNACLDatabaseIn:
+    Type: AWS::EC2::NetworkAclEntry
+    Properties:
+      RuleNumber: 300
+      CidrBlock: !Ref VpcCIDR
+      NetworkAclId: !Ref PrivateNACL
+      Protocol: 6 # tcp
+      PortRange:
+        From: 3306 # MySQL
+        To: 3306
+      RuleAction: allow
+
+  PrivateNACLEphemerealIn:
+    Type: AWS::EC2::NetworkAclEntry
+    Properties:
+      RuleNumber: 400
+      CidrBlock: !Ref VpcCIDR
+      NetworkAclId: !Ref PrivateNACL
+      Protocol: 6 # tcp
+      PortRange:
+        From: 1024
+        To: 65535
+      RuleAction: allow
+
+  PrivateNACLEphemerealOut: # outgoing in response to incoming
+    Type: AWS::EC2::NetworkAclEntry
+    Properties:
+      RuleNumber: 2000
+      CidrBlock: !Ref VpcCIDR
+      NetworkAclId: !Ref PrivateNACL
+      Protocol: 6 # tcp
+      Egress: true
+      PortRange:
+        From: 1024
+        To: 65535
+      RuleAction: allow
+
+  PrivateNACLHTTPOut: # yum updates, etc
+    Type: AWS::EC2::NetworkAclEntry
+    Properties:
+      RuleNumber: 2100
+      CidrBlock: !Ref VpcCIDR
+      NetworkAclId: !Ref PrivateNACL
+      Protocol: 6 # tcp
+      Egress: true
+      PortRange:
+        From: 80
+        To: 80
+      RuleAction: allow
+
+  PrivateNACLHTTPSOut: # yum updates, etc
+    Type: AWS::EC2::NetworkAclEntry
+    Properties:
+      RuleNumber: 2200
+      CidrBlock: !Ref VpcCIDR
+      NetworkAclId: !Ref PrivateNACL
+      Protocol: 6 # tcp
+      Egress: true
+      PortRange:
+        From: 443
+        To: 443
+      RuleAction: allow
+
+  # NETWORKING: WAF
+
+  XssMatchSet:
+    Type: AWS::WAF::XssMatchSet
+    Properties:
+      Name: "XSS matcher"
+      XssMatchTuples:
+        - FieldToMatch:
+            Type: QUERY_STRING
+          TextTransformation: URL_DECODE
+
+  XssRule:
+    Type: AWS::WAF::Rule
+    Properties:
+      Name: XSSRule
+      MetricName: XSSRule
+      Predicates:
+        - DataId: !Ref XssMatchSet
+          Negated: false
+          Type: XssMatch
+
+  SqlInjectionMatchSet:
+    Type: AWS::WAF::SqlInjectionMatchSet
+    Properties:
+      Name: "SQLi matcher"
+      SqlInjectionMatchTuples:
+        - FieldToMatch:
+            Type: QUERY_STRING
+          TextTransformation: URL_DECODE
+
+  SqlInjectionRule:
+    Type: AWS::WAF::Rule
+    Properties:
+      Name: SQLiRule
+      MetricName: SQLiRule
+      Predicates:
+        - DataId: !Ref SqlInjectionMatchSet
+          Negated: false
+          Type: SqlInjectionMatch
+
+  WebACL:
+    Type: AWS::WAF::WebACL
+    Properties:
+      DefaultAction:
+        Type: ALLOW
+      Name: !Sub ${AWS::StackName}WebACL
+      MetricName: !Sub ${AWS::StackName}WebACL
+      Rules:
+        - Action:
+            Type: BLOCK
+          Priority: 1
+          RuleId: !Ref XssRule
+        - Action:
+            Type: BLOCK
+          Priority: 2
+          RuleId: !Ref SqlInjectionRule
+
   # SECURITY GROUPS
 
   ApplicationLoadBalancerSecurityGroup:
@@ -395,6 +689,7 @@ Resources:
       DBSubnetGroupName: !Ref DatabaseSubnetGroup
       MasterUsername: !Ref DatabaseMasterUsername
       MasterUserPassword: !Ref DatabaseMasterPassword
+      StorageEncrypted: true
       VPCSecurityGroups:
         - !Ref RDSSecurityGroup
 
@@ -431,6 +726,8 @@ Resources:
               source: https://github.com/drush-ops/drush/releases/download/8.3.2/drush.phar
               mode: "000755" # executable
         configure:
+          sources:
+            /etc/ssl/certs/rds-combined-ca-bundle.pem: "https://s3.amazonaws.com/rds-downloads/rds-combined-ca-bundle.pem"
           commands:
             update_document_root:
               command:
@@ -507,6 +804,9 @@ Resources:
                   'driver' => 'mysql',
                   'prefix' => '',
                   'collation' => 'utf8mb4_general_ci',
+                  'pdo' => array(
+                    PDO::MYSQL_ATTR_SSL_CA => '/etc/ssl/certs/rds-combined-ca-bundle.pem',
+                  ),
                 );
                 $config_directories = array(); // TODO
                 $settings['hash_salt'] = file_get_contents('/var/www/drupal-8.7.10/sites/default/hash_salt');
