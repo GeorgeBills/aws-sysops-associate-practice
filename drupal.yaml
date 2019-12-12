@@ -418,7 +418,7 @@ Resources:
     Type: AWS::EC2::NetworkAclEntry
     Properties:
       RuleNumber: 400
-      CidrBlock: !Ref VpcCIDR
+      CidrBlock: 0.0.0.0/0 # packets from nat will have source ip from worldwide
       NetworkAclId: !Ref PrivateNACL
       Protocol: 6 # tcp
       PortRange:
@@ -443,7 +443,7 @@ Resources:
     Type: AWS::EC2::NetworkAclEntry
     Properties:
       RuleNumber: 2100
-      CidrBlock: !Ref VpcCIDR
+      CidrBlock: 0.0.0.0/0 # will route to nat, but dest ip will be worldwide
       NetworkAclId: !Ref PrivateNACL
       Protocol: 6 # tcp
       Egress: true
@@ -456,7 +456,7 @@ Resources:
     Type: AWS::EC2::NetworkAclEntry
     Properties:
       RuleNumber: 2200
-      CidrBlock: !Ref VpcCIDR
+      CidrBlock: 0.0.0.0/0 # will route to nat, but dest ip will be worldwide
       NetworkAclId: !Ref PrivateNACL
       Protocol: 6 # tcp
       Egress: true

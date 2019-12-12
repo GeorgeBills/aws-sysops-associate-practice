@@ -29,6 +29,9 @@
  - [ ] Registered domain name for the ELB
  - [X] Elastic IP for the bastion
  - [X] EC2 bastion host
+ - [ ] Route AWS traffic internally with a VPC endpoint
+   - [ ] [CloudFormation](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cfn-vpce-bucketnames.html)
+   - [ ] [Yum updates](https://aws.amazon.com/amazon-linux-ami/faqs/#vpc-endpoint)
 
 ## Web application
 
