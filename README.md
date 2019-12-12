@@ -2,6 +2,10 @@
 
  * Create initial stack, update stack:
    `aws cloudformation deploy --template-file drupal.yaml --stack-name mydrupalstack --parameter-overrides KeyName=MyKeyPair MyHomeCIDR=203.0.113.123/0 DatabaseMasterPassword=my53cr37p455w0rd LogsBucketName=mys3logsbucket MyMobilePhoneNumber=+61412345678 --capabilities CAPABILITY_NAMED_IAM`
+ * `ssh-add $env:userprofile\.ssh\MyKeyPair.pem`
+ * `ssh -A ec2-user@$env:bastion_ip`
+ * `ssh $drupal_ip`
+ * `bash /tmp/install.cmd` (would be nice to automate this...)
  * Delete stack and all of its resources:
    `aws cloudformation delete-stack --stack-name mydrupalstack`
 
