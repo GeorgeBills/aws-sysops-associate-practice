@@ -1,11 +1,43 @@
+# AWS SysOps Associate practice
+
+In the spirit of the [CKAD
+exercises](https://github.com/dgkanatsios/CKAD-exercises) this is a todo list of
+tasks - and the example source used to accomplish those tasks - that I worked
+through when studying for the [AWS Certified SysOps Administrator
+Associate](https://aws.amazon.com/certification/certified-sysops-admin-associate/)
+exam.
+
+The overall objective is to stand-up an off the shelf web app
+([Drupal](https://www.drupal.org/)), with a stereotypical ALB ⇨ EC2 ⇨ RDS / EFS
+architecture, using only CloudFormation, along with some nice to haves
+(CloudWatch monitoring, logs exported to CloudTrail, VPC security, etc).
+
+If you work through these tasks then you should have practical hands on exposure
+to most of the technologies and services covered by the exam (noticeably missing
+are e.g. Organizations, Guard Duty, Direct Connect, Snowball, Storage Gateway,
+anything to do with VPN's). Beyond that you'll need to know some theory, for
+which I recommend the [acloud.guru AWS Certified SysOps Administrator
+course](https://acloud.guru/learn/aws-certified-sysops-administrator-associate).
+You can pass the exam with just the theory but getting hands on will ensure you
+actually learn it all above just passing the exam.
+
+The code in this repository should _not_ be taken as a template for standing up
+a best practices application and infrastructure. I've cheaped out on various
+components just because it's my credit card on the account. I've put the whole
+thing in a single CloudFormation stack just because it makes it easier to stand
+up and tear down each night. In some places the infrastructure is more
+complicated than it needs to be just so that I could play more with a given
+service. Here be dragons!
+
 ## Useful commands
 
  * Create initial stack, update stack:
-   `aws cloudformation deploy --template-file drupal.yaml --stack-name mydrupalstack --parameter-overrides KeyName=MyKeyPair MyHomeCIDR=203.0.113.123/0 DatabaseMasterPassword=my53cr37p455w0rd LogsBucketName=mys3logsbucket MyMobilePhoneNumber=+61412345678 --capabilities CAPABILITY_NAMED_IAM`
- * `ssh-add $env:userprofile\.ssh\MyKeyPair.pem`
- * `ssh -A ec2-user@$env:bastion_ip`
- * `ssh $drupal_ip`
- * `bash /tmp/install.cmd` (would be nice to automate this...)
+   `aws cloudformation deploy --template-file drupal.yaml --stack-name mydrupalstack --parameter-overrides KeyName=MyKeyPair MyHomeCIDR=203.0.113.123/24 DatabaseMasterPassword=my53cr37p455w0rd LogsBucketName=mys3logsbucket MyMobilePhoneNumber=+61412345678 --capabilities CAPABILITY_NAMED_IAM`
+ * Connect to a given webserver:
+   * `ssh-add $env:userprofile\.ssh\MyKeyPair.pem`
+   * `ssh -A ec2-user@$env:bastion_ip`
+   * `ssh $drupal_ip`
+ * Install Drupal: `bash /tmp/install.cmd` (would be nice to automate this...)
  * Delete stack and all of its resources:
    `aws cloudformation delete-stack --stack-name mydrupalstack`
 

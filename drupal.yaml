@@ -954,9 +954,9 @@ Resources:
         - !Ref ZeroHealthyHostsAlarmTopic
       Dimensions:
         - Name: TargetGroup
-          Value: targetgroup/drupal-tg/df7202616d0bed71
+          Value: targetgroup/drupal-tg/df7202616d0bed71 # FIXME: should be a ref
         - Name: LoadBalancer
-          Value: app/drupal-alb/ee7e1d3d3c281893
+          Value: app/drupal-alb/ee7e1d3d3c281893 # FIXME: should be a ref
       MetricName: HealthyHostCount
       EvaluationPeriods: 1
       ComparisonOperator: LessThanOrEqualToThreshold
